@@ -19,7 +19,7 @@ const CatchGame: React.FC<GameProps> = ({ onBackToMenu, mode, lang }) => {
   const [timeLeft, setTimeLeft] = useState(30);
   const [items, setItems] = useState<{id: number, x: number, type: 'good' | 'bad', emoji: string, speed: number}[]>([]);
   const [gameOver, setGameOver] = useState(false);
-  const requestRef = useRef<number | null>(null);
+  const requestRef = useRef<number>();
   const lastSpawnTime = useRef<number>(0);
   const t = TRANSLATIONS[lang];
 
@@ -65,7 +65,7 @@ const CatchGame: React.FC<GameProps> = ({ onBackToMenu, mode, lang }) => {
     requestRef.current = requestAnimationFrame(gameLoop);
     return () => {
       clearInterval(timer);
-      if (requestRef.current !== null) cancelAnimationFrame(requestRef.current);
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
   }, [isPlaying, gameOver, spawnItem, score]);
 
@@ -280,24 +280,24 @@ const ReflexGame: React.FC<GameProps> = ({ onBackToMenu, mode, lang }) => {
   const [state, setState] = useState<'waiting' | 'ready' | 'go' | 'tooEarly' | 'result'>('waiting');
   const [startTime, setStartTime] = useState(0);
   const [ms, setMs] = useState(0);
-  const timeoutRef = useRef<number | null>(null);
+  const timeoutRef = useRef<number>();
   const t = TRANSLATIONS[lang];
 
   const startLevel = () => {
     setState('waiting');
     const delay = 1000 + Math.random() * 3000;
-    timeoutRef.current = window.setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       setState('go');
       setStartTime(Date.now());
       playSound.magic();
-    }, delay);
+    }, delay) as unknown as number;
   };
 
-  useEffect(() => { startLevel(); return () => { if (timeoutRef.current !== null) clearTimeout(timeoutRef.current); }; }, []);
+  useEffect(() => { startLevel(); return () => clearTimeout(timeoutRef.current); }, []);
 
   const handleClick = () => {
     if (state === 'waiting') {
-      if (timeoutRef.current !== null) clearTimeout(timeoutRef.current);
+      clearTimeout(timeoutRef.current);
       setState('tooEarly');
       haptics.soft();
       playSound.badItem();
