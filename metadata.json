@@ -1,0 +1,5 @@
+{
+  "name": "男娘指数计算器",
+  "description": "输入昵称，通过确定性算法测试你的二次元男娘指数！风格可爱，结果唯一。",
+  "requestFramePermissions": []
+}
